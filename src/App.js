@@ -1,26 +1,57 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import Navbar from "./components/Navbar";
+import Users from "./Users";
+import axios from "axios";
+import Search from "./components/Search";
+import Alert from "./Alert"
+export default class App extends Component {
+  state = {
+    users: [],
+    lodaing: false,
+    alert:null
+  };
+  
+  SearchUsers = async (text) => {
+    
+    
+    const res = await axios.get(
+      `https://api.github.com/search/users?q=${text}`
+    );
+    this.setState({ users: res.data.items, lodaing: false });
+    console.log(text);
+  };
+  clearUsers = () => {
+    console.log("chal raha hani");
+    this.setState({
+      users: [],
+      lodaing: false,
+      
+    });
+    window.location.reload();
+  };
+  setAlert=(msg)=>{
+   this.setState({
+     alert:{msg}
+   });
+   setTimeout(() => {
+     this.setState({
+       alert:null
+     })
+   }, 2000);
+  }
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  render() {
+    return (
+      <div>
+        <Navbar title="Github-Finder" icon="fab fa-github"></Navbar>
+        <Alert alert={this.state.alert}></Alert>
+        <Search
+          SearchUsers={this.SearchUsers}
+          clearUsers={this.clearUsers}
+          setAlert={this.setAlert}
+        ></Search>
+        <Users lodaing={this.state.lodaing} users={this.state.users}></Users>
+      </div>
+    );
+  }
 }
-
-export default App;
